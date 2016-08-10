@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-os.sys.path.append('/home/stephane/git/acaciadata')
+os.sys.path.append('/home/theo/texelmeet/acaciadata')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -20,11 +20,12 @@ os.sys.path.append('/home/stephane/git/acaciadata')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'lyh)8hhwcz*a7i-o9ndk(7j0(%e25o3ji^7e+anqq4e)f^7#y('
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 TEMPLATE_DEBUG = True
+
+SITE_ID = 1
 
 ALLOWED_HOSTS = ['.acaciadata.com', 'localhost']
 
@@ -40,13 +41,13 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
-    'django_extensions', # for ERD
+    'django.contrib.sites',
     'bootstrap3',
     'registration',
     'acacia',
     'acacia.data',
     'acacia.data.knmi',
-    'acacia.data.events',
+    'acacia.mqtt',
     'flevoland',
 )
 
@@ -77,11 +78,8 @@ WSGI_APPLICATION = 'flevoland.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
+
 DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-#         'NAME': os.path.join(BASE_DIR, 'acaciadata.db'),                      # Or path to database file if using sqlite3.
-#     },
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.mysql',
         'NAME': 'flevoland',                      # Or path to database file if using sqlite3.
@@ -91,7 +89,6 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -126,7 +123,7 @@ IMG_URL = '/img/'
 IMG_ROOT = os.path.join(os.path.dirname(BASE_DIR),'img')
 
 # Grapelli admin
-GRAPPELLI_ADMIN_TITLE='Beheer van Spaarwater-Flevoland meetgegevens'
+GRAPPELLI_ADMIN_TITLE='Beheer van Flevoland meetgegevens'
 
 # Celery stuff
 #BROKER_URL = 'django://'
@@ -140,21 +137,6 @@ ACCOUNT_ACTIVATION_DAYS = 7
 LOGIN_REDIRECT_URL = '/data/'
 
 LOGGING_ROOT = os.path.join(BASE_DIR, 'logs')
-
-
-# EMAIL_HOST='smtp.gmail.com'
-# EMAIL_PORT=587
-# EMAIL_HOST_USER='grondwatertoolbox@gmail.com'
-# EMAIL_HOST_PASSWORD='pw4toolbox'
-# EMAIL_USE_TLS = True
-
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-EMAIL_HOST='acaciadata.com'
-EMAIL_PORT=25
-EMAIL_HOST_USER='webmaster@acaciadata.com'
-EMAIL_HOST_PASSWORD='acaciawater'
-EMAIL_USE_TLS = True
 
 # Logging
 LOGGING = {
@@ -214,5 +196,3 @@ LOGGING = {
         },
     },
 }
-
-# from secrets import *
