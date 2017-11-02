@@ -1,27 +1,29 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib import admin
 
-from .views import HomeView
+from .views import HomeView, LocationView, FirstDetailView, SecondDetailView
 from acacia.data.views import DashGroupView
 
 admin.autodiscover()
 
-urlpatterns = patterns('flevoland.views',
+urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^grappelli/', include('grappelli.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^data/', include('acacia.data.urls',namespace='acacia')),
-    url(r'^(?P<name>[\w\s]+)$', DashGroupView.as_view(), name='dashboard-view'),
-)
+    url(r'^detail1/(?P<pk>[0-9]+)/$', FirstDetailView.as_view(), name='detail1'),
+    url(r'^detail2/(?P<pk>[0-9]+)/$', SecondDetailView.as_view(), name='detail2'),
+    url(r'^(?P<pk>[0-9]+)/$', LocationView.as_view(), name='location'),
+]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.IMG_URL, document_root=settings.IMG_ROOT)
 
 from django.contrib.auth import views as auth_views
-urlpatterns += patterns('',
+urlpatterns += [
     url(r'^password/change/$',
                     auth_views.password_change,
                     name='password_change'),
@@ -41,4 +43,4 @@ urlpatterns += patterns('',
                     auth_views.password_reset_confirm,
                     name='password_reset_confirm'),
     url(r'^accounts/', include('registration.backends.default.urls'))    
-)
+]

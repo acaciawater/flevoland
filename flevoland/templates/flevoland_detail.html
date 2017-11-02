@@ -12,7 +12,7 @@
 </style>
 {% endblock %}
 {% block navbar %}{% endblock %}
-{% block admin_url %}project/{{object.id}}{% endblock %}
+{% block admin_url %}data/project/{{object.id}}{% endblock %}
 {% block script %}
 {{ block.super }}
 {% localize off %}
@@ -52,7 +52,7 @@ $(function(){initialize();});
 {% block content %}
 <div class = "container">
 <div class = "row-fluid">
-<h3>{{object.name}}</h3>
+<h1>{{object.name}}</h1>
 {{object.description|safe}}
 </div>
 <div id = map style="width:100%;height:400px;"></div>
@@ -67,7 +67,7 @@ $(function(){initialize();});
 <tbody>
 {% for loc in object.projectlocatie_set.all %}
 <tr>
-<td><a href="{% url 'dashboard-view' loc.dashboard|default:loc.name %}">{{loc.name}}</a></td>
+<td><a href="{% url 'location' loc.id %}">{{loc.name}}</a></td>
 <td>{%if loc.webcam%}<a href="{{loc.webcam.image}}"><img src="{{loc.webcam.image}}"/></a>{% endif %}{{loc.description|safe}}</td>
 </tr>
 {% empty %}
