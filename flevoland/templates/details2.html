@@ -1,0 +1,12 @@
+{% extends 'project_locatie_detail.html' %}
+{% load staticfiles %}
+
+{% block content %}
+<div class = "container">
+
+<h2>{{projectlocatie.name}}</h2>
+
+<img id="plaatje" src="{% static 'flevoland/img/background3.png' %}" alt="Background" style="max-width:100%;">
+
+</div>
+{% endblock content %}
