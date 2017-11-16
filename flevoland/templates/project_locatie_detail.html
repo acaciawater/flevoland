@@ -6,54 +6,60 @@
 {% block admin_url %}data/project/{{object.id}}{% endblock %}
 {% block script %}
 {{ block.super }}
-{% localize off %}
-{% endlocalize %}
 {% endblock %}
 
 {% block content %}
 <div class = "container">
+  <h2>{{projectlocatie.name}}</h2>
 
-<h2>{{projectlocatie.name}}</h2>
+  <div id="includedContent"></div>
 
-<div id="includedContent"></div>
+  <button class="btn btn-default btn-lg" onclick="test3()">Back</button>
+  <button class="btn btn-default btn-lg" onclick="test2()">Forward</button>
 
-<button class="btn btn-default btn-lg" onclick="test3()">Back</button>
-<button class="btn btn-default btn-lg" onclick="test2()">Forward</button>
-
-<hr style='clear: left;'>
-<a href="{% url 'detail1' projectlocatie.id %}" style=" margin: 20px">Details1</a>
-<a href="{% url 'detail2' projectlocatie.id %}" style="margin: 20px">Details2</a>
-<hr style='clear: left;'>
-
+  <hr style='clear: left;'>
+  <a href="{% url 'detail1' projectlocatie.id %}" style="margin: 20px">Details1</a>
+  <a href="{% url 'detail2' projectlocatie.id %}" style="margin: 20px">Details2</a>
+  <hr style='clear: left;'>
 </div>
 
 
 
 
 
-
-
-
-
-
-
-
-
 <script>
-  var base = 0;
-  var max_height = 0;
+  var base1 = 0;
+  var base2 = 0;
+  var max_height1 = 0;
+  var max_height2 = 0;
   var original_stroke = 0;
   var original_stroke_width = 0;
   
+  function setConstants() {
+	var rectangle = document.getElementById("rect5178-7-1-8-9-9");
+	base1 = rectangle.y.baseVal.value + rectangle.height.baseVal.value;
+	max_height1 = rectangle.height.baseVal.value;
+	original_stroke_width = rectangle.style.strokeWidth;
+	original_stroke = rectangle.style.stroke;
+
+	var rectangle2 = document.getElementById("rect1308-8-4");
+	base2 = rectangle2.y.baseVal.value + rectangle2.height.baseVal.value;
+	max_height2 = rectangle2.height.baseVal.value;
+  }
+  
+  function setHeights() {
+	{% localize off %}
+	{% for dict in latest %}
+	setHeight("{{dict.rectangle_id}}",{{dict.level}})
+	{% endfor %}
+	{% endlocalize %}
+  }
+  
   function onSVGLoad() {
     document.getElementById("svg6909").style.width = "100%";
-    var rectangle = document.getElementById("rect5178-7-1-8-9-9");
-    rectangle.onclick = function onclick(evt) {test()};
-    
-    base = rectangle.y.baseVal.value + rectangle.height.baseVal.value;
-    max_height = rectangle.height.baseVal.value;
-    original_stroke_width = rectangle.style.strokeWidth;
-    original_stroke = rectangle.style.stroke;
+    setConstants();
+    setHeights();
+	doSomething();
   }
 
   $(function(){
@@ -61,23 +67,32 @@
   });
   
   
-  function setHeight(id,height_percentage) {
-	  var rectangle = document.getElementById(id);
-	  height = height_percentage * max_height;
-      rectangle.height.baseVal.value = height;
-      rectangle.y.baseVal.value = base - height;
+  function setHeight(id,level) {
+	var rectangle = document.getElementById(id);
+	if (rectangle.style.strokeWidth != "0") {
+	  var height_percentage = 1+level/1.5;
+	  var height = height_percentage * max_height1;
+	  rectangle.y.baseVal.value = base1 - height;
+	  rectangle.height.baseVal.value = height;
+	}
+	else {
+	  var height_percentage = 1+level/(7.0/9.0*1.5);
+	  var height = height_percentage * max_height2;
+	  rectangle.y.baseVal.value = base2 - height;
+	  rectangle.height.baseVal.value = height;
+	}
   }
   
   function toggleSelected(id) {
-      var rectangle = document.getElementById(id);
-      if (rectangle.style.strokeWidth < 0.49) {
-	      rectangle.style.stroke = "#ff0000";
-	      rectangle.style.strokeWidth = "0.5";
-      }
-      else {
-    	  rectangle.style.stroke = original_stroke;
-	      rectangle.style.strokeWidth = original_stroke_width;
-      }
+    var rectangle = document.getElementById(id);
+    if (rectangle.style.strokeWidth != "0.5") {
+	  rectangle.style.stroke = "#ff0000";
+	  rectangle.style.strokeWidth = "0.5";
+    }
+    else {
+      rectangle.style.stroke = original_stroke;
+	  rectangle.style.strokeWidth = original_stroke_width;
+    }
   }
   
   
@@ -94,14 +109,33 @@
   
   
   
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+  function doSomething() {
+	    var rectangle = document.getElementById("rect5178-7-1-8-9-9");
+	    rectangle.onclick = function onclick(evt) {test()};
+	    rectangle.style.cursor = 'pointer';
+	    
+	    var rectangle2 = document.getElementById("rect5178-7-1-8-9-9-0-1");
+	    rectangle2.onclick = function onclick(evt) {window.location = "http://www.google.com";};
+  }
+  
   function test() {
-	  toggleSelected("rect5178-7-1-8-9-9")
+	  toggleSelected("rect5178-7-1-8-9-9");
   }
   
   function test2() {
-      setHeight("rect5178-7-1-8-9-9",Math.random())
-      setHeight("rect5178-7-1-8-9-9-0",Math.random())
-      setHeight("rect5178-7-1-8-9-9-0-1",Math.random())      
+      setHeight("rect5178-7-1-8-9-9",-1.5*Math.random());
+      setHeight("rect5178-7-1-8-9-9-0",-1.5*Math.random());
+      setHeight("rect5178-7-1-8-9-9-0-1",-1.5*Math.random());
   }
   
   function test3() {
