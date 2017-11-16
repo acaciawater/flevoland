@@ -16,7 +16,22 @@ os.sys.path.append('/home/theo/texelmeet/acaciadata')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
-from secrets import *
+SECRET_KEY = 'secret'
+GOOGLE_MAPS_API_KEY = 'secret'
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.mysql',
+        'NAME': 'flevoland',
+        'USER': 'secret',
+        'PASSWORD': 'secret',
+        'HOST': '',                      # Set to empty string for localhost.
+        'PORT': '',                      # Set to empty string for default.
+    }
+}
+import secrets
+SECRET_KEY = secrets.SECRET_KEY
+GOOGLE_MAPS_API_KEY = secrets.GOOGLE_MAPS_API_KEY
+DATABASES = secrets.DATABASES
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
