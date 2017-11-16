@@ -50,7 +50,15 @@
   function setHeights() {
 	{% localize off %}
 	{% for dict in latest %}
-	setHeight("{{dict.rectangle_id}}",{{dict.level}})
+	setHeight("{{dict.rectangle_id}}",{{dict.level}});
+	{% endfor %}
+	{% endlocalize %}
+  }
+  
+  function setURLs() {
+	{% localize off %}
+	{% for dict in urls %}
+	setURL("{{dict.rectangle_id}}","{{dict.url}}");
 	{% endfor %}
 	{% endlocalize %}
   }
@@ -59,6 +67,7 @@
     document.getElementById("svg6909").style.width = "100%";
     setConstants();
     setHeights();
+    setURLs();
 	doSomething();
   }
 
@@ -94,42 +103,41 @@
 	  rectangle.style.strokeWidth = original_stroke_width;
     }
   }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
 
+  function setURL(id,url) {
+	    var rectangle = document.getElementById(id);
+	    rectangle.onclick = function onclick(evt) {window.location = url;};
+	    rectangle.style.cursor = 'pointer';
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /* The following code is just for show. */
   
   function doSomething() {
 	    var rectangle = document.getElementById("rect5178-7-1-8-9-9");
-	    rectangle.onclick = function onclick(evt) {test()};
+	    rectangle.onclick = function onclick(evt) {toggleSelected("rect5178-7-1-8-9-9");};
 	    rectangle.style.cursor = 'pointer';
-	    
-	    var rectangle2 = document.getElementById("rect5178-7-1-8-9-9-0-1");
-	    rectangle2.onclick = function onclick(evt) {window.location = "http://www.google.com";};
-  }
-  
-  function test() {
-	  toggleSelected("rect5178-7-1-8-9-9");
   }
   
   function test2() {
