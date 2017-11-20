@@ -48,16 +48,32 @@
 
 
 
+https://stackoverflow.com/questions/5966385/update-svg-dynamically
+https://stackoverflow.com/questions/17161631/how-to-create-a-new-anchor-tag-around-an-existing-element
 
 
 
 
 
 
+PRINT METHODS OF A JAVASCRIPT OBJECT:
+<script>
+function getMethods(obj) {
+	  var result = [];
+	  for (var id in obj) {
+	    try {
+	      if (typeof(obj[id]) == "function") {
+	        result.push(id + ": " + obj[id].toString());
+	      }
+	    } catch (err) {
+	      result.push(id + ": inaccessible");
+	    }
+	  }
+	  return result;
+	}
 
-
-
-
+alert(getMethods(b).join("\n"));
+</script>
 
 
 

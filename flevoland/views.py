@@ -3,7 +3,10 @@ Created on Oct 4, 2014
 
 @author: theo
 '''
-from django.shortcuts import get_object_or_404
+from datetime import datetime
+from pytz import utc
+
+from django.shortcuts import get_object_or_404, render
 from django.views.generic.base import TemplateView
 from django.views import generic
 from django.urls import reverse
@@ -21,66 +24,35 @@ class HomeView(ProjectDetailView):
         context = super(HomeView, self).get_context_data(**kwargs)
         context['maptype'] = 'roadmap'
         return context
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
 class LocationView(generic.DetailView):
     model = ProjectLocatie
     
-    def get_latest_values(self):
-        meetlocatie = get_object_or_404(MeetLocatie,name='Perseel N')
-        latest_values =  [{'rectangle_id' : x.rectangle_id, 'level':x.series.laatste().value} for x in meetlocatie.piezometer_set.all()]
-        return latest_values
+    def determine_opacity(self, date):
+        now = utc.localize(datetime.utcnow())
+        seconds_ago = (now - date).total_seconds()
+        if (seconds_ago > 86400.0):
+            return 0.0
+        else:
+            return 0.5 + 0.5*(1.0 - seconds_ago/86400.0)
     
-    def get_urls(self):
+    def get_latest(self):
         meetlocatie = get_object_or_404(MeetLocatie,name='Perseel N')
-        urls = [{'rectangle_id' : x.rectangle_id, 'url':reverse('acacia:series-detail', args=(x.series.pk,))} for x in meetlocatie.piezometer_set.all()]
-        return urls
+        latest = [{
+            'rectangle_id': x.rectangle_id,
+            'value': x.series.laatste().value,
+            'date': x.series.laatste().date,
+            'opacity': self.determine_opacity(x.series.laatste().date),
+            'url': reverse('acacia:series-detail', args=(x.series.pk, ))
+            } for x in meetlocatie.piezometer_set.all()]
+        return latest
     
     def get_context_data(self, **kwargs):
         context = super(LocationView, self).get_context_data(**kwargs)
-        context['latest'] = self.get_latest_values()
-        context['urls'] = self.get_urls()
+        context['latest'] = self.get_latest()
         return context
     
     template_name = 'project_locatie_detail.html'
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
 class FirstDetailView(generic.DetailView):
     model = ProjectLocatie
@@ -99,3 +71,8 @@ class SecondDetailView(generic.DetailView):
         return context
     
     template_name = 'details2.html'
+    
+def traversehistory(request):
+    meetlocatie = get_object_or_404(MeetLocatie,name='Perseel N')
+    context = {'test': 'test'}
+    return render(request, 'traversehistory.js', context)

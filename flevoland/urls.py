@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib import admin
 
-from .views import HomeView, LocationView, FirstDetailView, SecondDetailView
+from .views import HomeView, LocationView, FirstDetailView, SecondDetailView, traversehistory
 from acacia.data.views import DashGroupView
 
 admin.autodiscover()
@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^detail1/(?P<pk>[0-9]+)/$', FirstDetailView.as_view(), name='detail1'),
     url(r'^detail2/(?P<pk>[0-9]+)/$', SecondDetailView.as_view(), name='detail2'),
     url(r'^(?P<pk>[0-9]+)/$', LocationView.as_view(), name='location'),
+    url(r'^traversehistory$',traversehistory, name='traversehistory')
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

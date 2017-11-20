@@ -4,96 +4,104 @@
 {% block title %}Locatie {{object.name}}{% endblock title %}
 {% block navbar %}{% endblock %}
 {% block admin_url %}data/project/{{object.id}}{% endblock %}
-{% block script %}
-{{ block.super }}
-{% endblock %}
 
 {% block content %}
-<div class = "container">
-  <h2>{{projectlocatie.name}}</h2>
 
-  <div id="includedContent"></div>
-
-  <button class="btn btn-default btn-lg" onclick="test3()">Back</button>
-  <button class="btn btn-default btn-lg" onclick="test2()">Forward</button>
-
-  <hr style='clear: left;'>
-  <a href="{% url 'detail1' projectlocatie.id %}" style="margin: 20px">Details1</a>
-  <a href="{% url 'detail2' projectlocatie.id %}" style="margin: 20px">Details2</a>
-  <hr style='clear: left;'>
-</div>
-
-
-
-
-
-<script>
-  var base1 = 0;
-  var base2 = 0;
-  var max_height1 = 0;
-  var max_height2 = 0;
-  var original_stroke = 0;
-  var original_stroke_width = 0;
-  
-  function setConstants() {
-	var rectangle = document.getElementById("rect5178-7-1-8-9-9");
+<script>  
+  function setGlobalConstants() {
+	SVG = document.getElementById("includedSVG").getSVGDocument();
+	var rectangle = SVG.getElementById("rect5178-7-1-8-9-9");
 	base1 = rectangle.y.baseVal.value + rectangle.height.baseVal.value;
 	max_height1 = rectangle.height.baseVal.value;
 	original_stroke_width = rectangle.style.strokeWidth;
 	original_stroke = rectangle.style.stroke;
 
-	var rectangle2 = document.getElementById("rect1308-8-4");
+	var rectangle2 = SVG.getElementById("rect1308-8-4");
 	base2 = rectangle2.y.baseVal.value + rectangle2.height.baseVal.value;
 	max_height2 = rectangle2.height.baseVal.value;
   }
   
-  function setHeights() {
-	{% localize off %}
-	{% for dict in latest %}
-	setHeight("{{dict.rectangle_id}}",{{dict.level}});
-	{% endfor %}
-	{% endlocalize %}
-  }
-  
-  function setURLs() {
-	{% localize off %}
-	{% for dict in urls %}
-	setURL("{{dict.rectangle_id}}","{{dict.url}}");
-	{% endfor %}
-	{% endlocalize %}
-  }
-  
-  function onSVGLoad() {
-    document.getElementById("svg6909").style.width = "100%";
-    setConstants();
-    setHeights();
-    setURLs();
-	doSomething();
-  }
-
-  $(function(){
-    $("#includedContent").load("{% static 'flevoland/svg/Figuur0_website_peilbuizen_dynamisch.svg' %}", complete=onSVGLoad);
-  });
-  
-  
   function setHeight(id,level) {
-	var rectangle = document.getElementById(id);
-	if (rectangle.style.strokeWidth != "0") {
-	  var height_percentage = 1+level/1.5;
-	  var height = height_percentage * max_height1;
-	  rectangle.y.baseVal.value = base1 - height;
-	  rectangle.height.baseVal.value = height;
-	}
-	else {
-	  var height_percentage = 1+level/(7.0/9.0*1.5);
-	  var height = height_percentage * max_height2;
-	  rectangle.y.baseVal.value = base2 - height;
-	  rectangle.height.baseVal.value = height;
-	}
+    var rectangle = SVG.getElementById(id);
+    if (rectangle.style.strokeWidth != "0") {
+      var height_percentage = 1+level/1.5;
+      var height = height_percentage * max_height1;
+      rectangle.y.baseVal.value = base1 - height;
+      rectangle.height.baseVal.value = height;
+    }
+    else {
+      var height_percentage = 1+level/(7.0/9.0*1.5);
+      var height = height_percentage * max_height2;
+      rectangle.y.baseVal.value = base2 - height;
+      rectangle.height.baseVal.value = height;
+    }
   }
+  
+  function setURL(id, url) {
+	var rectangle = SVG.getElementById(id);
+	var a = SVG.createElementNS("http://www.w3.org/2000/svg", "a");
+	a.setAttribute("href",url);	
+	a.setAttribute("target","_blank");
+	rectangle.parentNode.replaceChild(a, rectangle);
+	a.appendChild(rectangle);
+  }
+  
+  function setTooltip(id, tooltip) {
+	var rectangle = SVG.getElementById(id);
+	var title = SVG.createElementNS("http://www.w3.org/2000/svg", "title");
+	title.textContent = tooltip;
+	rectangle.appendChild(title);
+  }
+  
+  function setOpacity(id, opacity) {
+	var rectangle = SVG.getElementById(id);
+	if (opacity == 0.0) {
+      rectangle.style.fill = "#A8A8A8";
+      return;
+	}
+	rectangle.style.fillOpacity = opacity
+  }
+  
+  function setLatest() {
+	{% localize off %}
+	{% for latest_dict in latest %}
+	  setURL("{{latest_dict.rectangle_id}}","{{latest_dict.url}}");
+	  setTooltip("{{latest_dict.rectangle_id}}","{{latest_dict.date}}");
+	  setHeight("{{latest_dict.rectangle_id}}",{{latest_dict.value}});
+	  setOpacity("{{latest_dict.rectangle_id}}",{{latest_dict.opacity}});
+	{% endfor %}
+	{% endlocalize %}
+  }
+  
+  function onSVGLoad() {	  
+    setGlobalConstants();
+    setLatest();
+	doSomething();
+    /*$.ajax({
+      method: "GET",
+      url: "{% url 'traversehistory' %}",
+      dataType: "script"
+    });*/
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   function toggleSelected(id) {
-    var rectangle = document.getElementById(id);
+    var rectangle = SVG.getElementById(id);
     if (rectangle.style.strokeWidth != "0.5") {
 	  rectangle.style.stroke = "#ff0000";
 	  rectangle.style.strokeWidth = "0.5";
@@ -103,39 +111,11 @@
 	  rectangle.style.strokeWidth = original_stroke_width;
     }
   }
-
-  function setURL(id,url) {
-	    var rectangle = document.getElementById(id);
-	    rectangle.onclick = function onclick(evt) {window.location = url;};
-	    rectangle.style.cursor = 'pointer';
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   
   /* The following code is just for show. */
   
   function doSomething() {
-	    var rectangle = document.getElementById("rect5178-7-1-8-9-9");
+	    var rectangle = SVG.getElementById("rect5178-7-1-8-9-9");
 	    rectangle.onclick = function onclick(evt) {toggleSelected("rect5178-7-1-8-9-9");};
 	    rectangle.style.cursor = 'pointer';
   }
@@ -147,11 +127,41 @@
   }
   
   function test3() {
-      var rectangle = document.getElementById("rect5178-7-1-8-9-9");
+      var rectangle = SVG.getElementById("rect5178-7-1-8-9-9");
       rectangle.y.baseVal.value -= 1;
       rectangle.height.baseVal.value += 1;
   }
 </script> 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class = "container">
+  <h2>{{projectlocatie.name}}</h2>
+  
+  <embed id="includedSVG" src="{% static 'flevoland/svg/Figuur0_website_peilbuizen_dynamisch2.svg' %}" width="100%" type="image/svg+xml" onload="onSVGLoad();"/>
+
+  <button class="btn btn-default btn-lg" onclick="test3()">Back</button>
+  <button class="btn btn-default btn-lg" onclick="test2()">Forward</button>
+
+  <hr style='clear: left;'>
+  <a href="{% url 'detail1' projectlocatie.id %}" style="margin: 20px">Details1</a>
+  <a href="{% url 'detail2' projectlocatie.id %}" style="margin: 20px">Details2</a>
+  <hr style='clear: left;'>
+</div>
 
 {% endblock content %}
