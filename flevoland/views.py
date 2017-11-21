@@ -72,7 +72,7 @@ class SecondDetailView(generic.DetailView):
     
     template_name = 'details2.html'
     
-def traversehistory(request):
+def history_JS(request):
     meetlocatie = get_object_or_404(MeetLocatie,name='Perseel N')
     context = {'test': 'test'}
-    return render(request, 'traversehistory.js', context)
+    return render(request, 'history.js', context)
