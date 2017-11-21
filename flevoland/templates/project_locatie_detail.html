@@ -8,7 +8,7 @@
 {% block content %}
 
 <script>  
-  function setGlobalConstants() {
+  function globals() {
 	SVG = document.getElementById("includedSVG").getSVGDocument();
 	var rectangle = SVG.getElementById("rect5178-7-1-8-9-9");
 	base1 = rectangle.y.baseVal.value + rectangle.height.baseVal.value;
@@ -19,6 +19,14 @@
 	var rectangle2 = SVG.getElementById("rect1308-8-4");
 	base2 = rectangle2.y.baseVal.value + rectangle2.height.baseVal.value;
 	max_height2 = rectangle2.height.baseVal.value;
+	
+	latest_data = {date:"Vandaag", values:[
+	{% localize off %}
+	{% for latest_dict in latest %}
+	  {id:"{{latest_dict.rectangle_id}}", date:"{{latest_dict.date}}", val:{{latest_dict.value}}, op:{{latest_dict.opacity}}},
+	{% endfor %}
+	{% endlocalize %}
+	]};
   }
   
   function setHeight(id,level) {
@@ -62,20 +70,28 @@
 	rectangle.style.fillOpacity = opacity
   }
   
-  function setLatest() {
-	{% localize off %}
-	{% for latest_dict in latest %}
-	  setURL("{{latest_dict.rectangle_id}}","{{latest_dict.url}}");
-	  setTooltip("{{latest_dict.rectangle_id}}","{{latest_dict.date}}");
-	  setHeight("{{latest_dict.rectangle_id}}",{{latest_dict.value}});
-	  setOpacity("{{latest_dict.rectangle_id}}",{{latest_dict.opacity}});
-	{% endfor %}
-	{% endlocalize %}
+  function setURLs() {
+		{% localize off %}
+		{% for latest_dict in latest %}
+		  setURL("{{latest_dict.rectangle_id}}","{{latest_dict.url}}");
+		{% endfor %}
+		{% endlocalize %}
+  }
+  
+  function setValues(data) {
+	vals = data.values
+    for (i=0; i<vals.length; i++) {
+      x = vals[i];
+      setTooltip(x.id,x.date);
+      setHeight(x.id,x.val);
+      setOpacity(x.id,x.op);
+    }
   }
   
   function onSVGLoad() {	  
-    setGlobalConstants();
-    setLatest();
+    globals();
+    setURLs();
+    setValues(latest_data);
 	doSomething();
     /*$.ajax({
       method: "GET",
