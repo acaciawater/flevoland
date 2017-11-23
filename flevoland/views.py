@@ -34,11 +34,11 @@ class HomeView(ProjectDetailView):
     
 
 def determine_opacity(date, comparison_date):
-    seconds_ago = (comparison_date - date).total_seconds()
-    if (seconds_ago > 86400.0):
+    difference_in_seconds = abs((comparison_date - date).total_seconds())
+    if (difference_in_seconds > 86400.0):
         return 0.0
     else:
-        return 0.5 + 0.5*(1.0 - seconds_ago/86400.0)    
+        return 0.5 + 0.5*(1.0 - difference_in_seconds/86400.0)    
     
     
 def get_data(day):
@@ -47,7 +47,9 @@ def get_data(day):
     timezone = pytz.timezone(settings.TIME_ZONE)
     for x in meetlocatie.piezometer_set.all():
         datapoint = x.series.datapoints.filter(date__lte=day).last()
-        #What if datapoint is None?
+        if datapoint is None:
+            datapoint = x.series.datapoints.all().first()
+            
         data_list.append({
             'id': x.rectangle_id,
             'val': datapoint.value,
@@ -107,7 +109,7 @@ class SecondDetailView(generic.DetailView):
     
     
 
-@cache_page(60 * 60 * 10)
+@cache_page(60 * 60 * 6)
 def history_JS(request):
     date = request.GET.get('date')
     timezone = pytz.timezone(settings.TIME_ZONE)
