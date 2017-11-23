@@ -3,16 +3,22 @@ Created on Oct 4, 2014
 
 @author: theo
 '''
-from datetime import datetime
+import json, pytz
+from datetime import datetime, timedelta
 from pytz import utc
 
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.views.generic.base import TemplateView
 from django.views import generic
 from django.urls import reverse
+from django.http import HttpResponse
+from django.conf import settings
 
 from acacia.data.models import Project, TabGroup, ProjectLocatie, MeetLocatie
 from acacia.data.views import ProjectDetailView
+from django.utils.formats import localize
+
+
 
 class HomeView(ProjectDetailView):
     template_name = 'flevoland_detail.html'
@@ -24,35 +30,52 @@ class HomeView(ProjectDetailView):
         context = super(HomeView, self).get_context_data(**kwargs)
         context['maptype'] = 'roadmap'
         return context
+    
+
+def determine_opacity(date, comparison_date):
+    seconds_ago = (comparison_date - date).total_seconds()
+    if (seconds_ago > 86400.0):
+        return 0.0
+    else:
+        return 0.5 + 0.5*(1.0 - seconds_ago/86400.0)    
+    
+    
+def get_data(day):
+    meetlocatie = get_object_or_404(MeetLocatie,name='Perseel N')
+    data_list = []
+    timezone = pytz.timezone(settings.TIME_ZONE)
+    for x in meetlocatie.piezometer_set.all():
+        datapoint = x.series.datapoints.filter(date__lte=day).last()
+        #What if datapoint is None?
+        data_list.append({
+            'id': x.rectangle_id,
+            'val': datapoint.value,
+            'date': localize(datapoint.date.astimezone(timezone)),
+            'op': determine_opacity(datapoint.date, day)
+            })
+    return data_list
+
 
 class LocationView(generic.DetailView):
     model = ProjectLocatie
     
-    def determine_opacity(self, date):
-        now = utc.localize(datetime.utcnow())
-        seconds_ago = (now - date).total_seconds()
-        if (seconds_ago > 86400.0):
-            return 0.0
-        else:
-            return 0.5 + 0.5*(1.0 - seconds_ago/86400.0)
-    
-    def get_latest(self):
+    def get_urls(self):
         meetlocatie = get_object_or_404(MeetLocatie,name='Perseel N')
-        latest = [{
+        urls = [{
             'rectangle_id': x.rectangle_id,
-            'value': x.series.laatste().value,
-            'date': x.series.laatste().date,
-            'opacity': self.determine_opacity(x.series.laatste().date),
             'url': reverse('acacia:series-detail', args=(x.series.pk, ))
             } for x in meetlocatie.piezometer_set.all()]
-        return latest
+        return urls
     
     def get_context_data(self, **kwargs):
         context = super(LocationView, self).get_context_data(**kwargs)
-        context['latest'] = self.get_latest()
+        now = utc.localize(datetime.utcnow())
+        context['data'] = get_data(now)
+        context['urls'] = self.get_urls()
         return context
     
     template_name = 'project_locatie_detail.html'
+
 
 class FirstDetailView(generic.DetailView):
     model = ProjectLocatie
@@ -63,6 +86,7 @@ class FirstDetailView(generic.DetailView):
     
     template_name = 'details1.html'
 
+
 class SecondDetailView(generic.DetailView):
     model = ProjectLocatie
     
@@ -72,7 +96,21 @@ class SecondDetailView(generic.DetailView):
     
     template_name = 'details2.html'
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
 def history_JS(request):
-    meetlocatie = get_object_or_404(MeetLocatie,name='Perseel N')
-    context = {'test': 'test'}
-    return render(request, 'history.js', context)
+    date = request.GET.get('date')
+    timezone = pytz.timezone(settings.TIME_ZONE)
+    day = timezone.localize(datetime.strptime(date,'%Y-%m-%d'))
+    day = day + timedelta(hours = 12)
+    j = json.dumps({'date':date, 'values':get_data(day)})
+    return HttpResponse(j, content_type='application/json')

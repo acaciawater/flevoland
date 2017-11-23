@@ -1,3 +1,65 @@
+in chart_detail.html in acacia/templates/data:
+	<script>
+		function fetchSeries() {
+		    $.ajax({
+			    url: '/data/get/chart/{{chart.id}}',
+			    datatype: "json",
+ 			    beforeSend: function(hdr) {
+ 				  	var chart = $('#container').highcharts();
+ 			    	chart.showLoading("Gegevens ophalen...");
+ 			    	return true;
+ 			    },
+			    success: function(data) {
+				  	var chart = $('#container').highcharts();
+				  	$.each(data,function(key,values) {
+				  		var series = chart.get(key);
+						series.setData(values);
+				  	});
+			    },
+			    error: function(hdr,status,errorThrown) {
+			    	//alert("Fout tijdens laden van tijdreeks: " + errorThrown);
+			    },
+ 			    complete: function(hdr, status) {
+ 				  	var chart = $('#container').highcharts();
+ 			    	chart.hideLoading();
+ 			    }
+		    });
+		}
+		
+		$(function () {
+		  var opt = {{options|safe}};
+		  opt.chart.events.load = fetchSeries;
+		  chart = $('#container').highcharts(opt);
+		});
+	</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script>
 /*
 1	RNM		rect1308
@@ -32,9 +94,20 @@
 
 22	PNM		rect1308-8-4
 */
+function test2() {
+    setHeight("rect5178-7-1-8-9-9",-1.5*Math.random());
+    setHeight("rect5178-7-1-8-9-9-0",-1.5*Math.random());
+    setHeight("rect5178-7-1-8-9-9-0-1",-1.5*Math.random());
+}
+
+function test3() {
+    var rectangle = SVG.getElementById("rect5178-7-1-8-9-9");
+    rectangle.y.baseVal.value -= 1;
+    rectangle.height.baseVal.value += 1;
+}
 </script>
 
-
+  
 
 
 
