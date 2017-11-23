@@ -17,6 +17,7 @@ from django.conf import settings
 from acacia.data.models import Project, TabGroup, ProjectLocatie, MeetLocatie
 from acacia.data.views import ProjectDetailView
 from django.utils.formats import localize
+from django.views.decorators.cache import cache_page
 
 
 
@@ -106,7 +107,7 @@ class SecondDetailView(generic.DetailView):
     
     
 
-    
+@cache_page(60 * 60 * 10)
 def history_JS(request):
     date = request.GET.get('date')
     timezone = pytz.timezone(settings.TIME_ZONE)
