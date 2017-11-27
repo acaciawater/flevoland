@@ -46,9 +46,9 @@ def get_data(day):
     data_list = []
     timezone = pytz.timezone(settings.TIME_ZONE)
     for x in meetlocatie.piezometer_set.all():
-        datapoint = x.series.datapoints.filter(date__lte=day).last()
+        datapoint = x.series.datapoints.filter(date__lte=day).latest('date')
         if datapoint is None:
-            datapoint = x.series.datapoints.all().first()
+            datapoint = x.series.datapoints.all().earliest('date')
             
         data_list.append({
             'id': x.rectangle_id,

@@ -297,7 +297,6 @@ function loadPrecipitation() {
 	 else {
 		 var date = new Date();
 		 date.setDate(date.getDate() - daysBack);
-		 alert(date);
 		 getJSONofDate(date, prefetchData);
 		 daysBack += 1;
 	 }
