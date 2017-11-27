@@ -19,36 +19,24 @@
  *   SVG rectangle manipulation
  */
 
- function globals() {
-     SVG = document.getElementById("includedSVG").getSVGDocument();
-     var rectangle = SVG.getElementById("rect5178-7-1-8-9-9");
+ function globals(includedSVG_id, rectangle_id_small, rectangle_id_large, initial_data) {
+     SVG = document.getElementById(includedSVG_id).getSVGDocument();
+     var rectangle = SVG.getElementById(rectangle_id_small);
      base1 = rectangle.y.baseVal.value + rectangle.height.baseVal.value;
      max_height1 = rectangle.height.baseVal.value;
      original_stroke_width = rectangle.style.strokeWidth;
      original_stroke = rectangle.style.stroke;
      original_fill = rectangle.style.fill;
 
-     var rectangle2 = SVG.getElementById("rect1308-8-4");
+     var rectangle2 = SVG.getElementById(rectangle_id_large);
      base2 = rectangle2.y.baseVal.value + rectangle2.height.baseVal.value;
      max_height2 = rectangle2.height.baseVal.value;
 
-     var now = new Date();
-     rectangle_data = {
-         "date": now.toISOString().split('T')[0],
-         "values": [
-             {% localize off %} 
-             {%for data_dict in data %} 
-             {
-                 "id": "{{data_dict.id}}",
-                 "date": "{% localize on %}{{data_dict.date}}{% endlocalize %}",
-                 "val": {{data_dict.val}},
-                 "op": {{data_dict.op}} 
-             },
-             {% endfor %}
-             {% endlocalize %}
-         ]
-     };
-     most_recent_rectangle_data = rectangle_data;
+     rectangle_data = initial_data;
+ }
+ 
+ function getDate() {
+	 return (new Date(rectangle_data.date));
  }
 
  function setHeight(id, level) {
@@ -126,19 +114,18 @@
      rectangle.parentNode.replaceChild(a, rectangle);
      a.appendChild(rectangle);
  }
-
- function setURLs() {
-     {% localize off %}
-     {% for url_dict in urls %}
-         setURL("{{url_dict.rectangle_id}}", "{{url_dict.url}}");
-     {% endfor %} 
-     {% endlocalize %}
- }
  
- function initializeRectangles() {	  
-     globals();
-     setURLs();
- }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
 </script>
 
 <script>
@@ -223,10 +210,10 @@ function loadPrecipitation() {
                     plotLines: [{
                         color: '#DDDDFF',
                         width: 50,
-                        value: (new Date(rectangle_data.date)).getTime()
+                        value: getDate().getTime()
                     }],
-                    max: (new Date(rectangle_data.date)).getTime() + 604800000,
-                    min: (new Date(rectangle_data.date)).getTime() - 604800000
+                    max: getDate().getTime() + 604800000,
+                    min: getDate().getTime() - 604800000
                 },
                 yAxis: {
                     title: {
@@ -280,7 +267,7 @@ function loadPrecipitation() {
 
  function getJSONofDate(date, success) {
 	 var d = new Date();
-	 d.setHours(d.getHours() - 11); // new Date(data.date) sets the time to 0:00 UTC? Subtract 11 hours to allow todays data after 12:00 local (Dutch) time (or after 13:00 in summer).
+	 d.setHours(d.getHours() - 14); // new Date(data.date) sets the time to 0:00 UTC? Subtract 14 hours to allow todays data after 15:00 local (Dutch) time (or after 16:00 in summer).
 	 if (date > d) {
 		 success(most_recent_rectangle_data);
 		 return;
@@ -301,20 +288,49 @@ function loadPrecipitation() {
 		 daysBack += 1;
 	 }
  }
+ 
+ function setURLs() {
+     {% localize off %}
+     {% for url_dict in urls %}
+         setURL("{{url_dict.rectangle_id}}", "{{url_dict.url}}");
+     {% endfor %} 
+     {% endlocalize %}
+ }
+ 
+ function initializeRectangles(includedSVG_id, rectangle_id_small, rectangle_id_large) {
+     var now = new Date();
+     most_recent_rectangle_data = {
+         "date": now.toISOString().split('T')[0],
+         "values": [
+             {% localize off %} 
+             {%for data_dict in data %} 
+             {
+                 "id": "{{data_dict.id}}",
+                 "date": "{% localize on %}{{data_dict.date}}{% endlocalize %}",
+                 "val": {{data_dict.val}},
+                 "op": {{data_dict.op}} 
+             },
+             {% endfor %}
+             {% endlocalize %}
+         ]
+     };
+	 globals(includedSVG_id, rectangle_id_small, rectangle_id_large, most_recent_rectangle_data);
+     setURLs();
+     setValues(most_recent_rectangle_data);
+ }
 
  function onSVGLoad() {
 	 loadPrecipitation();
-     initializeRectangles();
-     setValues(rectangle_data);
+     initializeRectangles("includedSVG","rect5178-7-1-8-9-9","rect1308-8-4");
      setDatePicker();
 
      document.getElementById("back-button").onclick = function onclick(evt) {
-         var date = new Date(rectangle_data.date);
+         var date = getDate();
          date.setDate(date.getDate() - 1);
          getJSONofDate(date, setValues);
      };
      document.getElementById("forward-button").onclick = function onclick(evt) {
-         var date = new Date(rectangle_data.date);
+         var date = getDate();
          date.setDate(date.getDate() + 1);
          getJSONofDate(date, setValues);
      };
