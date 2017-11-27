@@ -8,218 +8,338 @@
   {{ block.super }}
   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
 {% endblock script %}
 
 {% block content %}
 
-<script>  
-  function globals() {
-	SVG = document.getElementById("includedSVG").getSVGDocument();
-	var rectangle = SVG.getElementById("rect5178-7-1-8-9-9");
-	base1 = rectangle.y.baseVal.value + rectangle.height.baseVal.value;
-	max_height1 = rectangle.height.baseVal.value;
-	original_stroke_width = rectangle.style.strokeWidth;
-	original_stroke = rectangle.style.stroke;
-	original_fill = rectangle.style.fill;
 
-	var rectangle2 = SVG.getElementById("rect1308-8-4");
-	base2 = rectangle2.y.baseVal.value + rectangle2.height.baseVal.value;
-	max_height2 = rectangle2.height.baseVal.value;
-	
-	var now = new Date();
-	rectangle_data = {"date":now.toISOString().split('T')[0], "values":[
-	  {% localize off %}
-	  {% for data_dict in data %}
-	    {"id":"{{data_dict.id}}", "date":"{% localize on %}{{data_dict.date}}{% endlocalize %}", "val":{{data_dict.val}}, "op":{{data_dict.op}}},
-	  {% endfor %}
-	  {% endlocalize %}
-	]};
-  }
-  
-  function setHeight(id,level) {
-    var rectangle = SVG.getElementById(id);
-    if (rectangle.style.strokeWidth != "0") {
-      var height_percentage = 1+level/1.5;
-      var height = height_percentage * max_height1;
-      rectangle.y.baseVal.value = base1 - height;
-      rectangle.height.baseVal.value = height;
-    }
-    else {
-      var height_percentage = 1+level/(7.0/9.0*1.5);
-      var height = height_percentage * max_height2;
-      rectangle.y.baseVal.value = base2 - height;
-      rectangle.height.baseVal.value = height;
-    }
-  }
-  
-  function setURL(id, url) {
-	var rectangle = SVG.getElementById(id);
-	var a = SVG.createElementNS("http://www.w3.org/2000/svg", "a");
-	a.setAttribute("href",url);	
-	a.setAttribute("target","_blank");
-	rectangle.parentNode.replaceChild(a, rectangle);
-	a.appendChild(rectangle);
-  }
-  
-  function setTooltip(id, tooltip) {
-	var rectangle = SVG.getElementById(id);
-	if (rectangle.hasChildNodes()) {
-	  rectangle.children[0].textContent = tooltip;
-	}
-	else {
-	  var title = SVG.createElementNS("http://www.w3.org/2000/svg", "title");
-	  title.textContent = tooltip;
-	  rectangle.appendChild(title);
-	}
-  }
-  
-  function setOpacity(id, opacity) {
-	var rectangle = SVG.getElementById(id);
-	if (opacity == 0.0) {
-	  rectangle.style.fillOpacity = 1.0;
-      rectangle.style.fill = "#A8A8A8";
-      return;
-	}
-	rectangle.style.fillOpacity = opacity;
-    rectangle.style.fill = original_fill;
-  }
-  
-  function setURLs() {
-		{% localize off %}
-		{% for url_dict in urls %}
-		  setURL("{{url_dict.rectangle_id}}","{{url_dict.url}}");
-		{% endfor %}
-		{% endlocalize %}
-  }
-  
-  function setValues(data) {
-	rectangle_data = data;
-	vals = data.values;
-    for (i=0; i<vals.length; i++) {
-      x = vals[i];
-      setTooltip(x.id,x.date);
-      setHeight(x.id,x.val);
-      setOpacity(x.id,x.op);
-    }
-  }
-  
-  function goToDate(date) {
-	  var querystring = "date=" + date.toISOString().split('T')[0];
-	  $.getJSON("{% url 'history' %}",querystring,setValues);
-  }
-  
-  function onSVGLoad() {	  
-    globals();
-    setURLs();
-    setValues(rectangle_data);
-    setDatePicker();
-	doSomething();
-	
+<script>
+/*
+ *   SVG rectangle manipulation
+ */
 
-	document.getElementById("back-button").onclick = function onclick(evt) {
-		  var date = new Date(rectangle_data.date);
-		  date.setDate(date.getDate() - 1);
-		  $( "#datepicker" ).datepicker( "setDate", date);
-		  $( "#datepicker" ).datepicker( "refresh" );
-	      goToDate(date);
-    };
-	document.getElementById("forward-button").onclick = function onclick(evt) {
-		  var date = new Date(rectangle_data.date);
-		  date.setDate(date.getDate() + 1);
-		  $( "#datepicker" ).datepicker( "setDate", date);
-		  $( "#datepicker" ).datepicker( "refresh" );
-	      goToDate(date);
-    };
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  function toggleSelected(id) {
-    var rectangle = SVG.getElementById(id);
-    if (rectangle.style.strokeWidth != "0.5") {
-	  rectangle.style.stroke = "#ff0000";
-	  rectangle.style.strokeWidth = "0.5";
+ function globals() {
+     SVG = document.getElementById("includedSVG").getSVGDocument();
+     var rectangle = SVG.getElementById("rect5178-7-1-8-9-9");
+     base1 = rectangle.y.baseVal.value + rectangle.height.baseVal.value;
+     max_height1 = rectangle.height.baseVal.value;
+     original_stroke_width = rectangle.style.strokeWidth;
+     original_stroke = rectangle.style.stroke;
+     original_fill = rectangle.style.fill;
+
+     var rectangle2 = SVG.getElementById("rect1308-8-4");
+     base2 = rectangle2.y.baseVal.value + rectangle2.height.baseVal.value;
+     max_height2 = rectangle2.height.baseVal.value;
+
+     var now = new Date();
+     rectangle_data = {
+         "date": now.toISOString().split('T')[0],
+         "values": [
+             {% localize off %} 
+             {%for data_dict in data %} 
+             {
+                 "id": "{{data_dict.id}}",
+                 "date": "{% localize on %}{{data_dict.date}}{% endlocalize %}",
+                 "val": {{data_dict.val}},
+                 "op": {{data_dict.op}} 
+             },
+             {% endfor %}
+             {% endlocalize %}
+         ]
+     };
+     most_recent_rectangle_data = rectangle_data;
+ }
+
+ function setHeight(id, level) {
+     var rectangle = SVG.getElementById(id);
+     if (rectangle.style.strokeWidth != "0") {
+         var height_percentage = 1 + level / 1.5;
+         var height = height_percentage * max_height1;
+         rectangle.y.baseVal.value = base1 - height;
+         rectangle.height.baseVal.value = height;
+     } else {
+         var height_percentage = 1 + level / (7.0 / 9.0 * 1.5);
+         var height = height_percentage * max_height2;
+         rectangle.y.baseVal.value = base2 - height;
+         rectangle.height.baseVal.value = height;
+     }
+ }
+
+ function setTooltip(id, tooltip) {
+     var rectangle = SVG.getElementById(id);
+     if (rectangle.hasChildNodes()) {
+         rectangle.children[0].textContent = tooltip;
+     } else {
+         var title = SVG.createElementNS("http://www.w3.org/2000/svg", "title");
+         title.textContent = tooltip;
+         rectangle.appendChild(title);
+     }
+ }
+
+ function setOpacity(id, opacity) {
+     var rectangle = SVG.getElementById(id);
+     if (opacity == 0.0) {
+         rectangle.style.fillOpacity = 1.0;
+         rectangle.style.fill = "#A8A8A8";
+         return;
+     }
+     rectangle.style.fillOpacity = opacity;
+     rectangle.style.fill = original_fill;
+ }
+
+ function setRectangles(data) {
+     rectangle_data = data;
+     vals = data.values;
+     for (i = 0; i < vals.length; i++) {
+         x = vals[i];
+         setTooltip(x.id, x.date);
+         setHeight(x.id, x.val);
+         setOpacity(x.id, x.op);
+     }
+ }
+
+ function toggleSelected(id) {
+     var rectangle = SVG.getElementById(id);
+     if (rectangle.style.strokeWidth != "0.5") {
+         rectangle.style.stroke = "#ff0000";
+         rectangle.style.strokeWidth = "0.5";
+     } else {
+         rectangle.style.stroke = original_stroke;
+         rectangle.style.strokeWidth = original_stroke_width;
+     }
+ }
+
+ function setToggle(id) {
+     var rectangle = SVG.getElementById(id);
+     rectangle.onclick = function onclick(evt) {
+         toggleSelected(id);
+     };
+     rectangle.style.cursor = 'pointer';
+ }
+
+ function setURL(id, url) {
+     var rectangle = SVG.getElementById(id);
+     var a = SVG.createElementNS("http://www.w3.org/2000/svg", "a");
+     a.setAttribute("href", url);
+     a.setAttribute("target", "_blank");
+     rectangle.parentNode.replaceChild(a, rectangle);
+     a.appendChild(rectangle);
+ }
+
+ function setURLs() {
+     {% localize off %}
+     {% for url_dict in urls %}
+         setURL("{{url_dict.rectangle_id}}", "{{url_dict.url}}");
+     {% endfor %} 
+     {% endlocalize %}
+ }
+ 
+ function initializeRectangles() {	  
+     globals();
+     setURLs();
+ }
+</script>
+
+<script>
+/* 
+ *  DatePicker
+ */
+ function setDatePicker() {
+     $.datepicker.regional.nl = {
+         closeText: 'Sluiten',
+         prevText: '←',
+         nextText: '→',
+         currentText: 'Vandaag',
+         monthNames: ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'],
+         monthNamesShort: ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'],
+         dayNames: ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'],
+         dayNamesShort: ['zon', 'maa', 'din', 'woe', 'don', 'vri', 'zat'],
+         dayNamesMin: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'],
+         weekHeader: 'Wk',
+         dateFormat: 'yy-mm-dd',
+         firstDay: 1,
+         isRTL: false,
+         showMonthAfterYear: false,
+         yearSuffix: ''
+     };
+     $.datepicker.setDefaults($.datepicker.regional["nl"]);
+
+     $("#datepicker").datepicker({
+         showOn: "button",
+         buttonText: "Selecteer datum",
+         defaultDate: new Date()
+     }).on("change", function(e) {
+         var pickedDate = $(this).val();
+         var date = new Date(pickedDate);
+         getJSONofDate(date, setValues);
+     });
+ }
+</script>
+
+<script>
+/* 
+ *  Highcharts Neerslag
+ */
+function setTimeAxis(date) {
+    var chart = $('#container').highcharts();
+    if (chart) {
+        var msInWeek = 604800000;
+        chart.xAxis[0].setExtremes(date.getTime() - msInWeek, date.getTime() + msInWeek);
+        chart.xAxis[0].options.plotLines[0].value = date.getTime();
+        chart.xAxis[0].update();
     }
-    else {
-      rectangle.style.stroke = original_stroke;
-	  rectangle.style.strokeWidth = original_stroke_width;
-    }
-  }
-  
-  function setDatePicker() {
-    $.datepicker.regional.nl = {
-      closeText: 'Sluiten',
-      prevText: '←',
-      nextText: '→',
-      currentText: 'Vandaag',
-      monthNames: ['januari', 'februari', 'maart', 'april', 'mei', 'juni',
-      'juli', 'augustus', 'september', 'oktober', 'november', 'december'],
-      monthNamesShort: ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun',
-      'jul', 'aug', 'sep', 'okt', 'nov', 'dec'],
-      dayNames: ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'],
-      dayNamesShort: ['zon', 'maa', 'din', 'woe', 'don', 'vri', 'zat'],
-      dayNamesMin: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'],
-      weekHeader: 'Wk',
-      dateFormat: 'yy-mm-dd',
-      firstDay: 1,
-      isRTL: false,
-      showMonthAfterYear: false,
-      yearSuffix: ''};
-    $.datepicker.setDefaults( $.datepicker.regional[ "nl" ] );
-	    
-    $("#datepicker").datepicker({
-      showOn: "button",
-      buttonText: "Selecteer datum",
-      defaultDate: new Date()
-    }).on("change", function (e) {
-      var pickedDate = $(this).val();
-      var date = new Date(pickedDate);
-      goToDate(date);
+}
+
+function loadPrecipitation() {
+    $.ajax({
+        url: '/data/get/series/{{neerslag.pk}}',
+        datatype: "json",
+        success: function(receivedData) {
+            Highcharts.setOptions({
+                global: {
+                    useUTC: true
+                },
+                lang: {
+                    shortMonths: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"],
+                    months: ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"],
+                    weekdays: ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"],
+                }
+            });
+
+            Highcharts.chart('container', {
+                chart: {
+                    type: 'column',
+                    height: '10%'
+                },
+                title: {
+                    text: ''
+                },
+                xAxis: {
+                    type: "datetime",
+                    labels: {
+                        enabled: true
+                    },
+                    plotLines: [{
+                        color: '#DDDDFF',
+                        width: 50,
+                        value: (new Date(rectangle_data.date)).getTime()
+                    }],
+                    max: (new Date(rectangle_data.date)).getTime() + 604800000,
+                    min: (new Date(rectangle_data.date)).getTime() - 604800000
+                },
+                yAxis: {
+                    title: {
+                        text: ''
+                    },
+                    labels: {
+                        enabled: false
+                    },
+                    gridLineWidth: 0,
+                    max: 40,
+                    min: 0
+                },
+                legend: {
+                    enabled: false
+                },
+                tooltip: {
+                    xDateFormat: ' ',
+                    shared: true,
+                    valueSuffix: " mm",
+                    valueDecimals: 2
+                },
+                credits: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Neerslag',
+                    data: receivedData,
+                    pointRange: 24 * 3600 * 1000,
+                    pointPadding: 0,
+                    groupPadding: 0,
+                    pointPlacement: 1.0/12.0,
+                }]
+            });
+        }
     });
-  }
-  
-  function doSomething() {
-	    var rectangle = SVG.getElementById("rect5178-7-1-8-9-9");
-	    rectangle.onclick = function onclick(evt) {toggleSelected("rect5178-7-1-8-9-9");};
-	    rectangle.style.cursor = 'pointer';
-  }
+}
 
-</script> 
+</script>
 
+<script>
+/* 
+ *  Main
+ */
+ function setValues(data) {
+     setRectangles(data);
+     var date = new Date(data.date);
+     setTimeAxis(date);
+     $("#datepicker").datepicker("setDate", date);
+     $("#datepicker").datepicker("refresh");
+ }
 
+ function getJSONofDate(date, success) {
+	 var d = new Date();
+	 d.setHours(d.getHours() - 11); // new Date(data.date) sets the time to 0:00 UTC? Subtract 11 hours to allow todays data after 12:00 local (Dutch) time (or after 13:00 in summer).
+	 if (date > d) {
+		 success(most_recent_rectangle_data);
+		 return;
+	 }
+     var querystring = "date=" + date.toISOString().split('T')[0];
+     $.getJSON("{% url 'history' %}", querystring, success);
+ }
 
+ var daysBack = 1;
+ function prefetchData() {
+	 if (daysBack >= 31) {
+		 return;
+	 }
+	 else {
+		 var date = new Date();
+		 date.setDate(date.getDate() - daysBack);
+		 alert(date);
+		 getJSONofDate(date, prefetchData);
+		 daysBack += 1;
+	 }
+ }
 
+ function onSVGLoad() {
+	 loadPrecipitation();
+     initializeRectangles();
+     setValues(rectangle_data);
+     setDatePicker();
 
-
-
-
-
-
-
-
-
-
-
-
-
+     document.getElementById("back-button").onclick = function onclick(evt) {
+         var date = new Date(rectangle_data.date);
+         date.setDate(date.getDate() - 1);
+         getJSONofDate(date, setValues);
+     };
+     document.getElementById("forward-button").onclick = function onclick(evt) {
+         var date = new Date(rectangle_data.date);
+         date.setDate(date.getDate() + 1);
+         getJSONofDate(date, setValues);
+     };
+     
+     prefetchData();
+ }
+</script>
 
 <div class = "container">
   <h2>{{projectlocatie.name}}</h2>
   
-  <embed id="includedSVG" src="{% static 'flevoland/svg/Figuur0_website_peilbuizen_dynamisch2.svg' %}" width="100%" type="image/svg+xml" onload="onSVGLoad();"/>
-
-  <input type="button" id="datepicker" style="display: none;">
-  <button id="back-button" class="btn btn-default btn-lg">Back</button>
-  <button id="forward-button" class="btn btn-default btn-lg">Forward</button>
+  <hr style='clear: left;'>
+  
+  <div style='text-align:center;'>
+	  <input type="button" id="datepicker" style="display: none;">
+  </div>
+  <div style='text-align:center;'>
+	  <button id="back-button" class="btn btn-default btn-lg">Terug</button>
+	  <button id="forward-button" class="btn btn-default btn-lg">Vooruit</button>
+  </div>
+  
+  <div id="container" style="width:100%;"></div>
+  
+  <embed id="includedSVG" src="{% static 'flevoland/svg/Figuur0_website_peilbuizen_dynamisch3.svg' %}" width="100%" type="image/svg+xml" onload="onSVGLoad();"/>
 
   <hr style='clear: left;'>
   <a href="{% url 'detail1' projectlocatie.id %}" style="margin: 20px">Details1</a>

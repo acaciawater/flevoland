@@ -14,7 +14,7 @@ from django.urls import reverse
 from django.http import HttpResponse
 from django.conf import settings
 
-from acacia.data.models import Project, TabGroup, ProjectLocatie, MeetLocatie
+from acacia.data.models import Project, TabGroup, ProjectLocatie, MeetLocatie, Series
 from acacia.data.views import ProjectDetailView
 from django.utils.formats import localize
 from django.views.decorators.cache import cache_page
@@ -63,7 +63,7 @@ class LocationView(generic.DetailView):
     model = ProjectLocatie
     
     def get_urls(self):
-        meetlocatie = get_object_or_404(MeetLocatie,name='Perseel N')
+        meetlocatie = get_object_or_404(MeetLocatie, name='Perseel N')
         urls = [{
             'rectangle_id': x.rectangle_id,
             'url': reverse('acacia:series-detail', args=(x.series.pk, ))
@@ -73,6 +73,7 @@ class LocationView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(LocationView, self).get_context_data(**kwargs)
         now = utc.localize(datetime.utcnow())
+        context['neerslag'] = get_object_or_404(Series, name='Precipitation P5 (ECRN-100)')
         context['data'] = get_data(now)
         context['urls'] = self.get_urls()
         return context
@@ -109,7 +110,7 @@ class SecondDetailView(generic.DetailView):
     
     
 
-@cache_page(60 * 60 * 6)
+@cache_page(60 * 60 * 24)
 def history_JS(request):
     date = request.GET.get('date')
     timezone = pytz.timezone(settings.TIME_ZONE)
