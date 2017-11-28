@@ -18,8 +18,8 @@
 function setToggles() {
     {% localize off %}
     {% for pks_dict in pks %}
-    	RectEditor.setToggle("{{pks_dict.id}}",function() {addData("/data/get/series/{{pks_dict.pk}}")});
-    {% endfor %} 
+    	RectEditor.setToggle("{{pks_dict.id}}",function() {addData("/data/get/series/{{pks_dict.pk}}","{{pks_dict.name}}",0)});
+    {% endfor %}
     {% endlocalize %}
 }
 

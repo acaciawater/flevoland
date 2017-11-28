@@ -1,13 +1,7 @@
-'''
-Created on Oct 4, 2014
-
-@author: theo
-'''
 import json, pytz
 from datetime import datetime, timedelta
-from pytz import utc
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.generic.base import TemplateView
 from django.views import generic
 from django.urls import reverse
@@ -15,6 +9,7 @@ from django.http import HttpResponse
 from django.conf import settings
 
 from acacia.data.models import Project, TabGroup, ProjectLocatie, MeetLocatie, Series
+from .models import WebsiteText
 from acacia.data.views import ProjectDetailView
 from django.utils.formats import localize
 from django.views.decorators.cache import cache_page
@@ -25,7 +20,7 @@ class HomeView(ProjectDetailView):
     template_name = 'flevoland_detail.html'
 
     def get_object(self):
-        return get_object_or_404(Project,name='flevoland')
+        return get_object_or_404(Project,name='Spaarwater Flevoland')
 
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
@@ -61,6 +56,7 @@ def get_data(day):
 
 class LocationView(generic.DetailView):
     model = ProjectLocatie
+    template_name = 'locatie.html'
     
     def get_urls(self):
         meetlocatie = get_object_or_404(MeetLocatie, name='Perseel N')
@@ -72,55 +68,50 @@ class LocationView(generic.DetailView):
     
     def get_context_data(self, **kwargs):
         context = super(LocationView, self).get_context_data(**kwargs)
-        now = utc.localize(datetime.utcnow())
+        now = pytz.utc.localize(datetime.utcnow())
         context['neerslag'] = get_object_or_404(Series, name='Precipitation P5 (ECRN-100)')
         context['data'] = get_data(now)
         context['urls'] = self.get_urls()
         return context
-    
-    template_name = 'project_locatie_detail.html'
 
 
 class FirstDetailView(generic.DetailView):
     model = ProjectLocatie
+    template_name = 'details1.html'
     
     def get_pks(self):
         meetlocatie = get_object_or_404(MeetLocatie, name='Perseel N')
         pks = [{
             'id': x.rectangle_id,
-            'pk': x.series.pk
+            'pk': x.series.pk,
+            'name': x.name
             } for x in meetlocatie.piezometer_set.all()]
         return pks
     
     def get_context_data(self, **kwargs):
         context = super(FirstDetailView, self).get_context_data(**kwargs)
-        now = utc.localize(datetime.utcnow())
+        now = pytz.utc.localize(datetime.utcnow())
         context['neerslag'] = get_object_or_404(Series, name='Precipitation P5 (ECRN-100)')
         context['data'] = get_data(now)
         context['pks'] = self.get_pks()
         return context
     
-    template_name = 'details1.html'
 
 
 class SecondDetailView(generic.DetailView):
     model = ProjectLocatie
+    template_name = 'details2.html'
     
     def get_context_data(self, **kwargs):
         context = super(SecondDetailView, self).get_context_data(**kwargs)
         return context
     
-    template_name = 'details2.html'
     
     
-    
-    
-    
-    
-    
-    
-    
-    
+def info(request):
+    context = {'info':WebsiteText.objects.get(name='Algemene Informatie').contents}
+    return render(request,'info.html',context=context)
+
 
 @cache_page(60 * 60 * 6)
 def history_JS(request):

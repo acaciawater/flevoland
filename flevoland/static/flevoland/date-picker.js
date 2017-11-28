@@ -21,9 +21,12 @@ function getDatePicker(id) {
      };
      $.datepicker.setDefaults($.datepicker.regional["nl"]);
 
-     return $(id).datepicker({
-         showOn: "button",
-         buttonText: "Selecteer datum",
+     var picker = $(id).datepicker({
          defaultDate: new Date()
-     })
+     });
+     
+     $("#datepicker").datepicker("setDate", new Date());
+     $("#datepicker").datepicker("refresh");
+     
+     return picker;
  }

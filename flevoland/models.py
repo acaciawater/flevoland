@@ -14,3 +14,7 @@ class Piezometer(models.Model):
 
     class Meta:
         verbose_name_plural = 'piezometers'
+        
+class WebsiteText(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    contents = models.TextField(blank=True, null=True)

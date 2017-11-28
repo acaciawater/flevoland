@@ -1,0 +1,12 @@
+{% extends 'bootbase.html' %}
+{% load staticfiles %}
+{% load l10n %}
+{% block title %}Locatie {{object.name}}{% endblock title %}
+{% block navbar %}{% endblock %}
+{% block admin_url %}data/project/{{object.id}}{% endblock %}
+
+{% block content %}
+<div class="container">
+	{{info|safe}}
+</div>
+{% endblock content %}

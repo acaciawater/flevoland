@@ -34,7 +34,7 @@ function initializeChart(receivedData) {
             labels: {
                 format: '{value} m'
             },
-            min: -1.5,
+            min: -1,
             max: 0
 
         }, {
@@ -51,7 +51,7 @@ function initializeChart(receivedData) {
 
         }],
         legend: {
-            enabled: false
+            enabled: true
         },
         tooltip: {
             xDateFormat: ' ',
@@ -71,6 +71,8 @@ function initializeChart(receivedData) {
             yAxis: 1,
         }]
     });
+
+    //addData("/data/get/series/225","Neerslag KNMI",1)
 }
 
 function loadPrecipitation(series_url) {
@@ -81,18 +83,31 @@ function loadPrecipitation(series_url) {
     });
 }
 
+seriesName = null;
+yAxis = 0;
 function addDataToChart(data) {
     var chart = $('#chart-container').highcharts();
     if (chart) {
     	chart.addSeries({                        
-    	    name: 'Peil',
+    	    name: seriesName,
     	    data: data,
-            yAxis: 0
+            yAxis: yAxis
     	});
     }
 }
 
-function addData(series_url) {
+function addData(series_url,name,y) {
+	var chart = $('#chart-container').highcharts();
+    var seriesLength = chart.series.length;
+    for(var i = seriesLength - 1; i > -1; i--) {
+        if(chart.series[i].name == name) {
+            chart.series[i].remove();
+            return;
+        }
+    }
+    
+    yAxis = y;
+	seriesName = name;
     $.ajax({
         url: series_url,
         datatype: "json",
