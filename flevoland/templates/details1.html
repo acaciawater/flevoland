@@ -1,12 +1,38 @@
 {% extends 'project_locatie_detail.html' %}
-{% load staticfiles %}
 
 {% block content %}
+
+<script> 
+ function initializeRectangles() {
+     var now = new Date();
+     most_recent_rectangle_data = {
+         "date": now.toISOString().split('T')[0],
+         "values": [
+             {% localize off %} 
+             {%for data_dict in data %} 
+             {
+                 "id": "{{data_dict.id}}",
+                 "date": "{% localize on %}{{data_dict.date}}{% endlocalize %}",
+                 "val": {{data_dict.val}},
+                 "op": {{data_dict.op}} 
+             },
+             {% endfor %}
+             {% endlocalize %}
+         ]
+     };
+     RectEditor.initialize("includedSVG", "rect5178-7-1-8-9-9", "rect1308-8-4", most_recent_rectangle_data);
+ }
+ 
+ function onSVGLoad() {
+     initializeRectangles();
+ }
+</script>
+
 <div class = "container">
-
-<h2>{{projectlocatie.name}}</h2>
-
-<img id="plaatje" src="{% static 'flevoland/img/background2.png' %}" alt="Background" style="max-width:100%;">
+  <h2>{{projectlocatie.name}}</h2>
+  
+  <embed id="includedSVG" src="{% static 'flevoland/svg/Figuur0_website_peilbuizen_dynamisch3.svg' %}" width="100%" type="image/svg+xml" onload="onSVGLoad();"/>
 
 </div>
+
 {% endblock content %}

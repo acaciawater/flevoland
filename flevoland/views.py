@@ -86,6 +86,8 @@ class FirstDetailView(generic.DetailView):
     
     def get_context_data(self, **kwargs):
         context = super(FirstDetailView, self).get_context_data(**kwargs)
+        now = utc.localize(datetime.utcnow())
+        context['data'] = get_data(now)
         return context
     
     template_name = 'details1.html'

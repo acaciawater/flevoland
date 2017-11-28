@@ -28,6 +28,7 @@ RectEditor = (function() {
 	        max_height2 = rectangle2.height.baseVal.value;
 	
 	        date = new Date(initial_data.date);
+	        this.setRectangles(initial_data);
 	    },
 	    
 	    getDate: function() {
