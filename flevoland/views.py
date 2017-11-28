@@ -84,10 +84,20 @@ class LocationView(generic.DetailView):
 class FirstDetailView(generic.DetailView):
     model = ProjectLocatie
     
+    def get_pks(self):
+        meetlocatie = get_object_or_404(MeetLocatie, name='Perseel N')
+        pks = [{
+            'id': x.rectangle_id,
+            'pk': x.series.pk
+            } for x in meetlocatie.piezometer_set.all()]
+        return pks
+    
     def get_context_data(self, **kwargs):
         context = super(FirstDetailView, self).get_context_data(**kwargs)
         now = utc.localize(datetime.utcnow())
+        context['neerslag'] = get_object_or_404(Series, name='Precipitation P5 (ECRN-100)')
         context['data'] = get_data(now)
+        context['pks'] = self.get_pks()
         return context
     
     template_name = 'details1.html'

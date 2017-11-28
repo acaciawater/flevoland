@@ -83,7 +83,7 @@ RectEditor = (function() {
 	        }
 	    },
 	
-	    toggleSelected: function(id) {
+	    toggleColor: function(id) {
 	        var rectangle = SVG.getElementById(id);
 	        if (rectangle.style.strokeWidth != "0.5") {
 	            rectangle.style.stroke = "#ff0000";
@@ -94,10 +94,11 @@ RectEditor = (function() {
 	        }
 	    },
 	
-	    setToggle: function(id) {
+	    setToggle: function(id, action) {
 	        var rectangle = SVG.getElementById(id);
 	        rectangle.onclick = function onclick(evt) {
-	            this.toggleSelected(id);
+	            RectEditor.toggleColor(id);
+	            action();
 	        };
 	        rectangle.style.cursor = 'pointer';
 	    },
