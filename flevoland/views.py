@@ -112,7 +112,7 @@ class SecondDetailView(generic.DetailView):
     
     
 
-@cache_page(60 * 60 * 24)
+@cache_page(60 * 60 * 6)
 def history_JS(request):
     date = request.GET.get('date')
     timezone = pytz.timezone(settings.TIME_ZONE)
