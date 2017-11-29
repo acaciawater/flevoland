@@ -15,6 +15,20 @@ class Piezometer(models.Model):
     class Meta:
         verbose_name_plural = 'piezometers'
         
+        
+class SVGMetadata(models.Model):
+    meetlocatie = models.OneToOneField(MeetLocatie, related_name='SVG_metadata')
+    svg_file_name = models.CharField(max_length=50)
+    rectangle1_id = models.CharField(max_length=50)
+    rectangle2_id = models.CharField(max_length=50)
+    precipitation_per_day = models.ForeignKey(Series)
+    precipitation_per_hour = models.ForeignKey(Series, related_name='SVG_Metadata_set')
+        
 class WebsiteText(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
+    meetlocatie = models.ForeignKey(MeetLocatie, blank=True, null=True)
     contents = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        ordering = ['name',]
+        unique_together = ('meetlocatie', 'name', )

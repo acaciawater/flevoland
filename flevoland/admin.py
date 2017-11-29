@@ -5,7 +5,7 @@ from django import forms
 from django.contrib.gis.db import models
 
 # Register your models here.
-from .models import Piezometer, WebsiteText
+from .models import Piezometer, WebsiteText, SVGMetadata
 
 class Media:
     js = [
@@ -17,4 +17,5 @@ class WebsiteAdmin(admin.ModelAdmin):
     formfield_overrides = {models.TextField: {'widget': forms.Textarea(attrs={'class': 'htmleditor'})}}
 
 admin.site.register(Piezometer)
+admin.site.register(SVGMetadata)
 admin.site.register(WebsiteText, WebsiteAdmin, Media = Media)

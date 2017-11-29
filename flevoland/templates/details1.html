@@ -1,14 +1,8 @@
-{% extends 'bootbase.html' %}
+{% extends 'locatie.html' %}
 {% load staticfiles %}
 {% load l10n %}
-{% block title %}Locatie {{object.projectlocatie.name}}{% endblock title %}
-{% block navbar %}{% endblock %}
-{% block admin_url %}data/meetlocatie/{{object.id}}{% endblock %}
 {% block script %}
   {{ block.super }}
-  <script src="{% static 'flevoland/rect-editor.js' %}"></script>
-  
-  <script src="https://code.highcharts.com/highcharts.js"></script>
   <script src="{% static 'flevoland/highcharts-toggle.js' %}"></script>
 {% endblock script %}
 
@@ -40,7 +34,7 @@ function setToggles() {
              {% endlocalize %}
          ]
      };
-     RectEditor.initialize("includedSVG", "rect5178-7-1-8-9-9", "rect1308-8-4", most_recent_rectangle_data);
+     RectEditor.initialize("includedSVG", "{{object.SVG_metadata.rectangle1_id}}", "{{object.SVG_metadata.rectangle2_id}}", most_recent_rectangle_data);
  }
  
  function onSVGLoad() {
@@ -53,8 +47,13 @@ function setToggles() {
 <div class = "container">
   <h2>{{object.projectlocatie.name}}</h2>
   
-  <embed id="includedSVG" src="{% static 'flevoland/svg/Figuur0_website_peilbuizen_dynamisch3.svg' %}" width="100%" type="image/svg+xml" onload="onSVGLoad();"/>
+  
+{{ Top | safe }}
+  
+  <embed id="includedSVG" src="{% static object.SVG_metadata.svg_file_name %}" width="100%" type="image/svg+xml" onload="onSVGLoad();"/>
   <div id="chart-container" style="width:100%;"></div>
+  
+{{ Bottom | safe }}
 
 </div>
 

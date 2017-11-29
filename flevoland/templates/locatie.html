@@ -53,7 +53,7 @@
          ]
      };
      
-     RectEditor.initialize("includedSVG", "rect5178-7-1-8-9-9", "rect1308-8-4", most_recent_rectangle_data);
+     RectEditor.initialize("includedSVG", "{{object.SVG_metadata.rectangle1_id}}", "{{object.SVG_metadata.rectangle2_id}}", most_recent_rectangle_data);
      setURLs();
  }
 
@@ -122,12 +122,14 @@
   
   <div id="chart-container" style="width:100%;"></div>
   
-  <embed id="includedSVG" src="{% static 'flevoland/svg/Figuur0_website_peilbuizen_dynamisch3.svg' %}" width="100%" type="image/svg+xml" onload="onSVGLoad();"/>
+  <embed id="includedSVG" src="{% static object.SVG_metadata.svg_file_name %}" width="100%" type="image/svg+xml" onload="onSVGLoad();"/>
 
   <hr style='clear: left;'>
-  <a href="{% url 'detail1' object.id %}" style="margin: 20px">Details1</a>
-  <a href="{% url 'detail2' object.id %}" style="margin: 20px">Details2</a>
+  <a href="{% url 'detail1' object.id %}" style="margin: 20px">Grafieken</a>
+  <a href="{% url 'detail2' object.id %}" style="margin: 20px">Waterbalans</a>
   <hr style='clear: left;'>
+  
+  {{object.description|safe}}
 </div>
 
 {% endblock content %}

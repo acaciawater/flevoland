@@ -47,14 +47,13 @@ function initializeChart(receivedData) {
             },
             opposite: true,
             min: 0,
-            max: 40
+            max: 6
 
         }],
         legend: {
             enabled: true
         },
         tooltip: {
-            xDateFormat: ' ',
             shared: false,
             valueDecimals: 2
         },
@@ -63,16 +62,18 @@ function initializeChart(receivedData) {
         },
         series: [{
             name: 'Neerslag',
+            type: 'column',
             data: receivedData,
-            pointRange: 24 * 3600 * 1000,
+            pointRange: 1 * 3600 * 1000,
+            tooltip: {
+                xDateFormat: ' ',
+            	valueSuffix: " mm"
+            },
             pointPadding: 0,
             groupPadding: 0,
-            pointPlacement: 1.0/12.0,
             yAxis: 1,
         }]
     });
-
-    //addData("/data/get/series/225","Neerslag KNMI",1)
 }
 
 function loadPrecipitation(series_url) {
@@ -91,7 +92,10 @@ function addDataToChart(data) {
     	chart.addSeries({                        
     	    name: seriesName,
     	    data: data,
-            yAxis: yAxis
+            yAxis: yAxis,
+            tooltip: {
+            	valueSuffix: " m"
+            }
     	});
     }
 }

@@ -33,7 +33,7 @@ def determine_opacity(date, comparison_date):
     if (difference_in_seconds > 86400.0):
         return 0.0
     else:
-        return 0.5 + 0.5*(1.0 - difference_in_seconds/86400.0)    
+        return 0.5 + 0.5*(1.0 - difference_in_seconds/86400.0)
     
     
 def get_data(meetlocatie,day):
@@ -69,7 +69,7 @@ class LocationView(generic.DetailView):
         context = super(LocationView, self).get_context_data(**kwargs)
         meetlocatie = self.get_object()
         now = pytz.utc.localize(datetime.utcnow())
-        context['neerslag'] = get_object_or_404(Series, name='Precipitation P5 (ECRN-100)')
+        context['neerslag'] = meetlocatie.SVG_metadata.precipitation_per_day
         context['data'] = get_data(meetlocatie,now)
         context['urls'] = self.get_urls()
         return context
@@ -92,9 +92,11 @@ class FirstDetailView(generic.DetailView):
         context = super(FirstDetailView, self).get_context_data(**kwargs)
         meetlocatie = self.get_object()
         now = pytz.utc.localize(datetime.utcnow())
-        context['neerslag'] = get_object_or_404(Series, name='Precipitation P5 (ECRN-100)')
+        context['neerslag'] = meetlocatie.SVG_metadata.precipitation_per_hour
         context['data'] = get_data(meetlocatie,now)
         context['pks'] = self.get_pks()
+        context['Top'] = meetlocatie.websitetext_set.get(name='GrafiekenTop').contents
+        context['Bottom'] = meetlocatie.websitetext_set.get(name='GrafiekenBottom').contents
         return context
     
 
