@@ -61,12 +61,12 @@
  
  function getJSONofDate(date, success) {
 	 var d = new Date();
-	 d.setHours(d.getHours() - 14); // new Date(data.date) sets the time to 0:00 UTC? Subtract 14 hours to allow today's data after 15:00 local (Dutch) time (or after 16:00 in summer).
-	 if (date > d) {
+	 var querystringToday = "date=" + d.toISOString().split('T')[0];
+     var querystring = "date=" + date.toISOString().split('T')[0];
+	 if ((date > d) || (querystringToday == querystring)) {
 		 success(most_recent_rectangle_data);
 		 return;
 	 }
-     var querystring = "date=" + date.toISOString().split('T')[0];
      $.getJSON("{% url 'history' object.id %}", querystring, success);
  }
 

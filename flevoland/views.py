@@ -120,6 +120,6 @@ def history_JS(request,pk):
     date = request.GET.get('date')
     timezone = pytz.timezone(settings.TIME_ZONE)
     day = timezone.localize(datetime.strptime(date,'%Y-%m-%d'))
-    day = day + timedelta(hours = 12)
+    day = day + timedelta(hours = 24) - timedelta(seconds = 1)
     j = json.dumps({'date':date, 'values':get_data(meetlocatie,day)})
     return HttpResponse(j, content_type='application/json')
