@@ -14,8 +14,9 @@ class Media:
     ]
 
 class WebsiteAdmin(admin.ModelAdmin):
+    list_display = ('name', 'meetlocatie', )
     formfield_overrides = {models.TextField: {'widget': forms.Textarea(attrs={'class': 'htmleditor'})}}
-
+    
 admin.site.register(Piezometer)
 admin.site.register(SVGMetadata)
 admin.site.register(WebsiteText, WebsiteAdmin, Media = Media)
