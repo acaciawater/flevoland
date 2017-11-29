@@ -1,9 +1,9 @@
 {% extends 'bootbase.html' %}
 {% load staticfiles %}
 {% load l10n %}
-{% block title %}Locatie {{object.name}}{% endblock title %}
+{% block title %}Locatie {{object.projectlocatie.name}}{% endblock title %}
 {% block navbar %}{% endblock %}
-{% block admin_url %}data/project/{{object.id}}{% endblock %}
+{% block admin_url %}data/meetlocatie/{{object.id}}{% endblock %}
 {% block script %}
   {{ block.super }}
   <script src="{% static 'flevoland/rect-editor.js' %}"></script>
@@ -67,7 +67,7 @@
 		 return;
 	 }
      var querystring = "date=" + date.toISOString().split('T')[0];
-     $.getJSON("{% url 'history' %}", querystring, success);
+     $.getJSON("{% url 'history' object.id %}", querystring, success);
  }
 
  var daysBack = 1;
@@ -110,7 +110,7 @@
 </script>
 
 <div class = "container">
-  <h2>{{projectlocatie.name}}</h2>
+  <h2>{{object.projectlocatie.name}}</h2>
   
   <hr style='clear: left;'>
   
@@ -125,8 +125,8 @@
   <embed id="includedSVG" src="{% static 'flevoland/svg/Figuur0_website_peilbuizen_dynamisch3.svg' %}" width="100%" type="image/svg+xml" onload="onSVGLoad();"/>
 
   <hr style='clear: left;'>
-  <a href="{% url 'detail1' projectlocatie.id %}" style="margin: 20px">Details1</a>
-  <a href="{% url 'detail2' projectlocatie.id %}" style="margin: 20px">Details2</a>
+  <a href="{% url 'detail1' object.id %}" style="margin: 20px">Details1</a>
+  <a href="{% url 'detail2' object.id %}" style="margin: 20px">Details2</a>
   <hr style='clear: left;'>
 </div>
 

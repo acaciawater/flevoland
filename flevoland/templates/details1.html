@@ -1,9 +1,9 @@
 {% extends 'bootbase.html' %}
 {% load staticfiles %}
 {% load l10n %}
-{% block title %}Locatie {{object.name}}{% endblock title %}
+{% block title %}Locatie {{object.projectlocatie.name}}{% endblock title %}
 {% block navbar %}{% endblock %}
-{% block admin_url %}data/project/{{object.id}}{% endblock %}
+{% block admin_url %}data/meetlocatie/{{object.id}}{% endblock %}
 {% block script %}
   {{ block.super }}
   <script src="{% static 'flevoland/rect-editor.js' %}"></script>
@@ -51,7 +51,7 @@ function setToggles() {
 </script>
 
 <div class = "container">
-  <h2>{{projectlocatie.name}}</h2>
+  <h2>{{object.projectlocatie.name}}</h2>
   
   <embed id="includedSVG" src="{% static 'flevoland/svg/Figuur0_website_peilbuizen_dynamisch3.svg' %}" width="100%" type="image/svg+xml" onload="onSVGLoad();"/>
   <div id="chart-container" style="width:100%;"></div>
