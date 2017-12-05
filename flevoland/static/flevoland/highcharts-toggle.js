@@ -29,7 +29,7 @@ function initializeChart(receivedData) {
         },
         yAxis: [{
             title: {
-                text: 'Peil'
+                text: 'Peil (t.o.v. maaiveld)'
             },
             labels: {
                 format: '{value} m'
