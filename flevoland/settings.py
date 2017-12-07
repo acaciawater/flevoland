@@ -34,7 +34,7 @@ GOOGLE_MAPS_API_KEY = secrets.GOOGLE_MAPS_API_KEY
 DATABASES = secrets.DATABASES
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = secrets.DEBUG
 
 
 SITE_ID = 1
