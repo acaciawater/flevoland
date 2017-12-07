@@ -180,7 +180,7 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        'acacia.data': {
+        'acacia': {
             'handlers': ['file',],
             'level': 'DEBUG',
             'propagate': True,

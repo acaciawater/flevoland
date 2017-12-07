@@ -40,8 +40,11 @@ def get_data(meetlocatie,day):
     data_list = []
     timezone = pytz.timezone(settings.TIME_ZONE)
     for x in meetlocatie.piezometer_set.all():
-        datapoint = x.series.datapoints.filter(date__lte=day).latest('date')
-        if datapoint is None:
+        queryset = x.series.datapoints.filter(date__lte=day)
+        datapoint = None
+        if queryset:
+            datapoint = queryset.latest('date')
+        else:
             datapoint = x.series.datapoints.all().earliest('date')
             
         data_list.append({
@@ -72,6 +75,7 @@ class LocationView(generic.DetailView):
         context['neerslag'] = meetlocatie.SVG_metadata.precipitation_per_day
         context['data'] = get_data(meetlocatie,now)
         context['urls'] = self.get_urls()
+        context['Top'] = meetlocatie.websitetext_set.get(name='LocatieTop').contents
         return context
 
 
