@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.http import HttpResponse
 from django.conf import settings
 
-from acacia.data.models import Project, TabGroup, MeetLocatie, Series
+from acacia.data.models import Project, TabGroup, MeetLocatie, Series, DataPoint
 from .models import WebsiteText
 from acacia.data.views import ProjectDetailView
 from django.utils.formats import localize
@@ -40,13 +40,11 @@ def get_data(meetlocatie,day):
     data_list = []
     timezone = pytz.timezone(settings.TIME_ZONE)
     for x in meetlocatie.piezometer_set.all():
-        queryset = x.series.datapoints.filter(date__lte=day)
-        datapoint = None
-        if queryset:
-            datapoint = queryset.latest('date')
-        else:
-            datapoint = x.series.datapoints.all().earliest('date')
-            
+        try:
+            datapoint = x.series.datapoints.filter(date__lte=day).latest('date')
+        except DataPoint.DoesNotExist:
+            datapoint = x.series.datapoints.earliest('date')
+        
         data_list.append({
             'id': x.rectangle_id,
             'val': datapoint.value,
