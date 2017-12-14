@@ -14,7 +14,7 @@ function initializeChart(receivedData) {
     Highcharts.chart('chart-container', {
         chart: {
             type: 'line',
-            height: '30%',
+            height: 300,
             zoomType: 'x'
         },
         title: {
