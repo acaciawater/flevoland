@@ -53,7 +53,7 @@ RectEditor = (function() {
 	    setTooltip: function(id, tooltip) {
 	        var rectangle = SVG.getElementById(id);
 	        if (rectangle.hasChildNodes()) {
-	            rectangle.children[0].textContent = tooltip;
+	            rectangle.firstChild.textContent = tooltip;
 	        } else {
 	            var title = SVG.createElementNS("http://www.w3.org/2000/svg", "title");
 	            title.textContent = tooltip;
