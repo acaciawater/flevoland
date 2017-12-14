@@ -15,7 +15,7 @@ function initializeChart(receivedData) {
     Highcharts.chart('chart-container', {
         chart: {
             type: 'column',
-            height: '10%'
+            height: 80
         },
         title: {
             text: ''
@@ -27,7 +27,7 @@ function initializeChart(receivedData) {
             },
             plotLines: [{
                 color: '#DDDDFF',
-                width: 50,
+                width: 20,
                 value: center
             }],
             max: center + 604800000,
@@ -41,7 +41,7 @@ function initializeChart(receivedData) {
                 enabled: false
             },
             gridLineWidth: 0,
-            max: 40,
+            max: 20,
             min: 0
         },
         legend: {
